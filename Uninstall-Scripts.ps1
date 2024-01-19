@@ -46,6 +46,9 @@ Begin
 Process
 {	
 	Remove-PathFromProfile -PathVariable 'Path' -Path (Get-Location).Path
+	
+	Remove-AliasFromProfile -Script 'Get-FactorioModsHelp' -Alias 'gfmh'
+	Remove-AliasFromProfile -Script 'Get-FactorioModsHelp' -Alias 'fmhelp'
 }
 
 End
