@@ -49,6 +49,12 @@ Process
 	Add-PathToProfile -PathVariable 'PSModulePath' -Path $Modulegfmh	
 	Add-AliasToProfile -Script 'Get-FactorioModsHelp' -Alias 'gfmh'
 	Add-AliasToProfile -Script 'Get-FactorioModsHelp' -Alias 'fmhelp'
+	Add-AliasToProfile -Script 'Build-FactorioMod' -Alias 'bfm'
+	Add-AliasToProfile -Script 'Build-FactorioMod' -Alias 'fmbd'
+	Add-AliasToProfile -Script 'Open-FactorioLog' -Alias 'ofl'
+	Add-AliasToProfile -Script 'Open-FactorioLog' -Alias 'fmol'
+	Add-AliasToProfile -Script 'Set-FactorioModDirectory' -Alias 'sfmd'
+	Add-AliasToProfile -Script 'Set-FactorioModDirectory' -Alias 'fmsd'
 }
 
 End

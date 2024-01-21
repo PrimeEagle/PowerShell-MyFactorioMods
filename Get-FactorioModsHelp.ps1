@@ -1,9 +1,9 @@
 <#
 	.SYNOPSIS
-	Shows help summary for all FactorioMods scripts.
+	Shows help summary for all Factorio Mods scripts.
 	
 	.DESCRIPTION
-	Shows help summary for all FactorioMods scripts.
+	Shows help summary for all Factorio Mods scripts.
 
 	.INPUTS
 	None.
@@ -32,13 +32,15 @@ param (
 DynamicParam { Build-BaseParameters }
 
 Begin
-{
+{	
 	Write-LogTrace "Execute: $(Get-RootScriptName)"
+	$minParams = Get-MinimumRequiredParameterCount -CommandInfo (Get-Command $MyInvocation.MyCommand.Name)
 	$cmd = @{}
 
 	if(Get-BaseParamHelpFull) { $cmd.HelpFull = $true }
-	if(Get-BaseParamHelpDetail) { $cmd.HelpDetail = $true }
+	if((Get-BaseParamHelpDetail) -Or ($PSBoundParameters.Count -lt $minParams)) { $cmd.HelpDetail = $true }
 	if(Get-BaseParamHelpSynopsis) { $cmd.HelpSynopsis = $true }
+	
 	if($cmd.Count -gt 1) { Write-DisplayHelp -Name "$(Get-RootScriptPath)" -HelpDetail }
 	if($cmd.Count -eq 1) { Write-DisplayHelp -Name "$(Get-RootScriptPath)" @cmd }
 }

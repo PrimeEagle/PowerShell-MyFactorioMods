@@ -49,6 +49,12 @@ Process
 	
 	Remove-AliasFromProfile -Script 'Get-FactorioModsHelp' -Alias 'gfmh'
 	Remove-AliasFromProfile -Script 'Get-FactorioModsHelp' -Alias 'fmhelp'
+	Remove-AliasFromProfile -Script 'Build-FactorioMod' -Alias 'bfm'
+	Remove-AliasFromProfile -Script 'Build-FactorioMod' -Alias 'fmbd'
+	Remove-AliasFromProfile -Script 'Open-FactorioLog' -Alias 'ofl'
+	Remove-AliasFromProfile -Script 'Open-FactorioLog' -Alias 'fmol'
+	Remove-AliasFromProfile -Script 'Set-FactorioModDirectory' -Alias 'sfmd'
+	Remove-AliasFromProfile -Script 'Set-FactorioModDirectory' -Alias 'fmsd'
 }
 
 End
