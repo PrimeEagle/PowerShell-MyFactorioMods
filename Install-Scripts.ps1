@@ -46,7 +46,8 @@ Begin
 Process
 {	
 	Add-PathToProfile -PathVariable 'Path' -Path (Get-Location).Path
-	Add-PathToProfile -PathVariable 'PSModulePath' -Path $Modulegfmh	
+	Add-PathToProfile -PathVariable 'PSModulePath' -Path $ModulesPath
+	
 	Add-AliasToProfile -Script 'Get-FactorioModsHelp' -Alias 'gfmh'
 	Add-AliasToProfile -Script 'Get-FactorioModsHelp' -Alias 'fmhelp'
 	Add-AliasToProfile -Script 'Build-FactorioMod' -Alias 'bfm'
