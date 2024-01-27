@@ -27,7 +27,7 @@ using module Varan.PowerShell.Validation
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Requires -Version 5.0
 #Requires -Modules Varan.PowerShell.Validation
-[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
 param (	[Parameter(Mandatory = $false)][Alias("M")]	[switch] $Modular,
 		[Parameter(ParameterSetName = "IncludeLibrary", Mandatory = $false)][Alias("IL")]	[switch] $IncludeLibrary,
 		[Parameter(ParameterSetName = "RemoveLibrary", Mandatory = $false)][Alias("RL")]	[switch] $RemoveLibrary
@@ -145,7 +145,10 @@ Process
 				$leaf = ($Path | Split-Path -Leaf)
 				$dir = $Path.Substring(0, $Path.Length - $leaf.Length) + $newName
 
-				Rename-Item -Path $Path $newName 
+				if ($PSCmdlet.ShouldProcess($Path, 'Rename to $newName.')) 
+				{
+					Rename-Item -Path $Path $newName 
+				}
 				
 				$result = $dir
 			}
@@ -169,19 +172,31 @@ Process
 
 			if(Test-Path $oldZipPath)
 			{
-				Remove-Item -Path $oldZipPath -Force
+				if ($PSCmdlet.ShouldProcess($oldZipPath, 'Delete file.')) 
+				{
+					Remove-Item -Path $oldZipPath -Force
+				}
 			}
 			
-			& $sevenZipExe a -r "$newZipPath" "$Path*.*" "-xr!todo*.txt" "-xr!*.vsdx" "-xr!*.bat" "-xr!*.xlsx"   | Out-Null
+			if ($PSCmdlet.ShouldProcess($newZipPath, 'Compress.')) 
+			{
+				& $sevenZipExe a -r "$newZipPath" "$Path*.*" "-xr!todo*.txt" "-xr!*.vsdx" "-xr!*.bat" "-xr!*.xlsx"   | Out-Null
+			}
 		}
 
 		$modPath = Get-Location
-		Set-Location "D:\"
+		if ($PSCmdlet.ShouldProcess("D:\", 'Set location.')) 
+		{
+			Set-Location "D:\"
+		}
 
 		$modName = Get-ModName -Path $modPath
 		if($modName.Length -eq 0)
 		{
-			Set-Location $modPath
+			if ($PSCmdlet.ShouldProcess($modPath, 'Set location.')) 
+			{
+				Set-Location $modPath
+			}
 			Write-Host ", make sure you're in a mod directory"
 			Write-Host "terminating"
 			exit
@@ -206,17 +221,29 @@ Process
 
 			if(-Not (Test-Path "$modPath\$libDir"))
 			{
-				New-Item -Path "$modPath\" -Name "$libDir" -ItemType "Directory" | Out-Null
+				if ($PSCmdlet.ShouldProcess($modPath, 'Create path.')) 
+				{
+					New-Item -Path "$modPath\" -Name "$libDir" -ItemType "Directory" | Out-Null
+				}
 			}
 			
 			if(-Not (Test-Path "$modPath\$graphicsDir\$libDir"))
 			{
-				New-Item -Path "$modPath\$graphicsDir\" -Name "$libDir" -ItemType "Directory" | Out-Null
+				if ($PSCmdlet.ShouldProcess("$modPath\$graphicsDir", 'Create path.')) 
+				{
+					New-Item -Path "$modPath\$graphicsDir\" -Name "$libDir" -ItemType "Directory" | Out-Null
+				}
 			}
 
-			Copy-Item -Path "$pePath\*" -Destination "$modPath\$libDir" -Include *.lua -Recurse -Force
-			Copy-Item -Path "$pePath\$graphicsDir\$libDir\*" -Destination "$modPath\$graphicsDir\$libDir" -Recurse -Force
-			Write-Host "done"
+			if ($PSCmdlet.ShouldProcess($pePath, 'Copy to $modPath\$libDir.')) 
+			{
+				Copy-Item -Path "$pePath\*" -Destination "$modPath\$libDir" -Include *.lua -Recurse -Force
+			}
+			
+			if ($PSCmdlet.ShouldProcess("$pePath\$graphicsDir\$libDir", 'Copy to $modPath\$graphicsDir\$libDir.')) 
+			{
+				Copy-Item -Path "$pePath\$graphicsDir\$libDir\*" -Destination "$modPath\$graphicsDir\$libDir" -Recurse -Force
+			}
 		}
 
 		if($RemoveLibrary)
@@ -224,14 +251,19 @@ Process
 			Write-Host "removing library..." -NoNewLine
 			if(Test-Path "$modPath\$libDir")
 			{
-				Remove-Item -Recurse -Force "$modPath\$libDir"
+				if ($PSCmdlet.ShouldProcess("$modPath\$libDir", 'Remove.')) 
+				{
+					Remove-Item -Recurse -Force "$modPath\$libDir"
+				}
 			}
 			
 			if(Test-Path "$modPath\$graphicsDir\$libDir")
 			{
-				Remove-Item -Recurse -Force "$modPath\$graphicsDir\$libDir"
+				if ($PSCmdlet.ShouldProcess("$modPath\$graphicsDir\$libDir", 'Remove.')) 
+				{
+					Remove-Item -Recurse -Force "$modPath\$graphicsDir\$libDir"
+				}
 			}
-			Write-Host "done"
 		}
 			
 
@@ -241,7 +273,10 @@ Process
 		$modVersions = Get-ModVersions -Path $modPath
 		if($modVersions.NewVersion.Length -eq 0)
 		{
-			Set-Location $modPath
+			if ($PSCmdlet.ShouldProcess("$modPath", 'Set location.')) 
+			{
+				Set-Location $modPath
+			}
 			Write-Host "terminating"
 			exit
 		}
@@ -253,12 +288,18 @@ Process
 				
 		if($topPath -ne $newTopPath)
 		{
-			Rename-Item -Path $topPath ($newTopPath | Split-Path -Leaf)
+			if ($PSCmdlet.ShouldProcess("$topPath", "Rename to $newTopPath")) 
+			{
+				Rename-Item -Path $topPath ($newTopPath | Split-Path -Leaf)
+			}
 		}
 		$modPath = $newTopPath + $mpLeaf
 
 		Compress-Mod -ModName $modName -VersionInfo $modVersions -Path $newTopPath
-		Set-Location $modPath
+		if ($PSCmdlet.ShouldProcess("$modPath", 'Set location.')) 
+		{
+			Set-Location $modPath
+		}
 		Write-Host "done"
 
 		if($Modular)
@@ -281,7 +322,10 @@ Process
 						$mn = Get-ModName -Path $md.FullName -Module
 						if($mn.Length -eq 0)
 						{
-							Set-Location $modPath
+							if ($PSCmdlet.ShouldProcess("$modPath", 'Set location.')) 
+							{
+								Set-Location $modPath
+							}
 							Write-Host "  skipping"
 							continue
 						}
@@ -289,12 +333,18 @@ Process
 						$mv = Get-ModVersions -Path $md.FullName -Module
 						if($mv.NewVersion.Length -eq 0)
 						{
-							Set-Location $modPath
+							if ($PSCmdlet.ShouldProcess("$modPath", 'Set location.')) 
+							{
+								Set-Location $modPath
+							}
 							Write-Host "  skipping"
 							continue
 						}
 						$mp = Update-ModVersion -Path $md.FullName -ModName $mn -VersionInfo $mv
-						Compress-Mod -ModName $mn -VersionInfo $mv -Path $mp
+						if ($PSCmdlet.ShouldProcess("$mn", 'Compress.')) 
+						{
+							Compress-Mod -ModName $mn -VersionInfo $mv -Path $mp
+						}
 						Write-Host "  done."
 						
 						$chainBase = $md.FullName + "\" + $chainsDir
@@ -315,7 +365,10 @@ Process
 									
 									if($cn.Length -eq 0)
 									{
-										Set-Location $modPath
+										if ($PSCmdlet.ShouldProcess("$modPath", 'Set location.')) 
+										{
+											Set-Location $modPath
+										}
 										Write-Host "  skipping"
 										continue
 									}
@@ -324,13 +377,19 @@ Process
 									$cv = Get-ModVersions -Path $cd.FullName -Chain
 									if($cv.NewVersion.Length -eq 0)
 									{
-										Set-Location $modPath
+										if ($PSCmdlet.ShouldProcess("$modPath", 'Set location.')) 
+										{
+											Set-Location $modPath
+										}
 										Write-Host "  skipping"
 										continue
 									}
 									
 									$cp = Update-ModVersion -Path $cd.FullName -ModName $cn -VersionInfo $cv
-									Compress-Mod -ModName $cn -VersionInfo $cv -Path $cp
+									if ($PSCmdlet.ShouldProcess("$cn", 'Compress.')) 
+									{
+										Compress-Mod -ModName $cn -VersionInfo $cv -Path $cp
+									}
 									Write-Host "    done."
 								}
 							}

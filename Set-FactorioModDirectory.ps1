@@ -21,7 +21,7 @@ using module Varan.PowerShell.Validation
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Requires -Version 5.0
 #Requires -Modules Varan.PowerShell.Validation
-[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
 param (	
 		[Parameter]	[switch]$Extract
 	  )
@@ -106,8 +106,11 @@ Process
 			$mn = ($zipFile | Split-Path -Leaf)
 			$mn = $mn.Substring(0, $mn.Length - 4)
 			
-			& $sevenZipExe x -y "$zipFile" "-o$modRootDir\$mn" #| Out-Null
-			Start-Sleep -Seconds 2
+			if ($PSCmdlet.ShouldProcess($zipFile, 'Extract to $modRootDir\$mn.')) 
+			{
+				& $sevenZipExe x -y "$zipFile" "-o$modRootDir\$mn"
+				Start-Sleep -Seconds 2
+			}
 			
 			$topModDir = $modRootDir + "\" + $mn
 			$mds = Get-ChildItem $topModDir -Directory
@@ -151,7 +154,10 @@ Process
 			}	
 		}
 
-		Set-Location $finalLocation
+		if ($PSCmdlet.ShouldProcess($finalLocation, 'Set location.')) 
+		{
+			Set-Location $finalLocation
+		}
 	}
 	catch [System.Exception]
 	{
